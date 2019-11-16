@@ -53,7 +53,7 @@ instance.interceptors.response.use(res => {
     // 获取当前路径地址,做登录之后的回跳处理
     const loginConfig = { path: '/login',
       query: {
-        redirect: router.$currentRoute.path
+        redirectURL: router.$currentRoute.path
       } }
     // 获取vuex中用户状态信息
     const { user } = store.state

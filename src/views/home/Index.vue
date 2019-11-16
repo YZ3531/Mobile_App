@@ -2,7 +2,7 @@
   <div class="container">
     <!-- tab项 -->
     <van-tabs swipeable>
-      <van-tab :key="index" v-for="index in 8" :title="'标签 ' + index">
+      <van-tab :key="item.id" v-for="item in myChannels" :title="item.name">
         <div class="scroll-wrapper">
           <!-- 单元格 -->
           <van-cell-group>
@@ -67,20 +67,17 @@
 </template>
 
 <script>
+import { getMyChannels } from '@/api/channel'
 export default {
   name: 'container-home',
   data () {
     return {
-      // 下拉刷新
-      isLoading: false,
-      // 刷新成功提示信息
-      refreshSuccessText: '',
-      // 上拉加载中
-      upLoading: false,
-      // 是否全部加载,为true触发文字提示
-      finished: false,
-      // 文章列表
-      articles: []
+      isLoading: false, // 下拉刷新
+      refreshSuccessText: '', // 刷新成功提示信息
+      upLoading: false, // 上拉加载中
+      finished: false, // 是否全部加载,为true触发文字提示
+      articles: [], // 文章列表
+      myChannels: [] // 我的频道数据
     }
   },
   methods: {
@@ -118,7 +115,17 @@ export default {
           this.refreshSuccessText = '暂无更新' // 给刷新后没有获取到数据的提示
         }
       }, 1000)
+    },
+    // 获取我的频道信息
+    async getMyChannels () {
+      const data = await getMyChannels()
+      console.log(data)
+
+      this.myChannels = data.channels // 渲染频道（标签页，tabs组件）
     }
+  },
+  created () {
+    this.getMyChannels() // 获取频道数据
   }
 }
 </script>
