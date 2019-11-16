@@ -1,5 +1,5 @@
 <template>
-  <div class="container-layout">
+  <div class="container">
     <!-- 顶部 -->
     <van-nav-bar fixed v-if="path!=='/user'" title="黑马头条" right-text="搜索" @click-right="$router.push('/search')" />
     <!-- 内容 -->
@@ -34,7 +34,7 @@ export default {
 </script>
 
 <style lang="less">
-.container-layout{
+.container{
     width: 100%;
     height: 100%;
     position: relative;
