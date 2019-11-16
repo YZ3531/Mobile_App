@@ -7,7 +7,11 @@
           <!-- 单元格 -->
           <van-cell-group>
             <!-- 下拉刷新 -->
-            <van-pull-refresh v-model="isLoading" @refresh="onRefresh" :success-text="refreshSuccessText">
+            <van-pull-refresh
+              v-model="isLoading"
+              @refresh="onRefresh"
+              :success-text="refreshSuccessText"
+            >
               <!-- 列表 : 绑定上拉加载事件,以及绑定 -->
               <van-list
                 v-model="upLoading"
@@ -15,7 +19,40 @@
                 finished-text="没有更多了"
                 @load="onLoad"
               >
-                <van-cell v-for="item in articles" :key="item">{{item}}</van-cell>
+                <van-cell v-for="item in articles" :key="item">
+                  <!-- 三张图结构 -->
+                  <div class="article_item">
+                    <h3 class="van-ellipsis">PullRefresh下拉刷新PullRefresh下拉刷新下拉刷新下拉刷新</h3>
+                    <div class="img_box">
+                      <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+                      <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+                      <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+                    </div>
+                    <div class="info_box">
+                      <span>你像一阵风</span>
+                      <span>8评论</span>
+                      <span>10分钟前</span>
+                      <span class="close">
+                        <van-icon name="cross"></van-icon>
+                      </span>
+                    </div>
+                  </div>
+                  <!-- 一张图结构 -->
+                  <div class="article_item">
+                    <h3 class="van-ellipsis">PullRefresh下拉刷新PullRefresh下拉刷新下拉刷新下拉刷新</h3>
+                    <div class="img_box">
+                      <van-image class="w100" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+                    </div>
+                    <div class="info_box">
+                      <span>你像一阵风</span>
+                      <span>8评论</span>
+                      <span>10分钟前</span>
+                      <span class="close">
+                        <van-icon name="cross"></van-icon>
+                      </span>
+                    </div>
+                  </div>
+                </van-cell>
               </van-list>
             </van-pull-refresh>
           </van-cell-group>
@@ -67,10 +104,12 @@ export default {
     },
     // 刷新
     onRefresh () {
-      window.setTimeout(() => { // 模拟网络耗时
+      window.setTimeout(() => {
+        // 模拟网络耗时
         this.isLoading = false // 数据请求成功，结束正在刷新的效果
         const arr = [1, 2, 3, 4, 5, 6] // 模拟响应数据
-        if (arr.length) { // 如果相应回来有数据
+        if (arr.length) {
+          // 如果相应回来有数据
           this.articles = arr // 将回来的数据给文章列表
           this.refreshSuccessText = '刷新成功' // 给出刷新成功提示信息
           this.onLoad() // 回来的数据可能不够占满屏幕，调用一次上拉加载
@@ -138,6 +177,47 @@ export default {
     z-index: 1000;
     &::before {
       font-size: 20px;
+    }
+  }
+}
+// 内容样式
+.article_item {
+  h3 {
+    font-weight: normal;
+    line-height: 2;
+  }
+  .img_box {
+    display: flex;
+    justify-content: space-between;
+    .w33 {
+      width: 33%;
+      height: 90px;
+    }
+    .w100 {
+      width: 100%;
+      height: 180px;
+    }
+  }
+  .info_box {
+    color: #999;
+    line-height: 2;
+    position: relative;
+    font-size: 12px;
+    span {
+      padding-right: 10px;
+      &.close {
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        line-height: 15px;
+        height: 12px;
+        width: 16px;
+        text-align: center;
+        padding-right: 0;
+        font-size: 8px;
+        position: absolute;
+        right: 0;
+        top: 7px;
+      }
     }
   }
 }
