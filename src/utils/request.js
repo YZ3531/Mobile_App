@@ -53,10 +53,10 @@ instance.interceptors.response.use(res => {
     // 获取当前路径地址,做登录之后的回跳处理
     const loginConfig = { path: '/login',
       query: {
-        redirectURL: router.$currentRoute.path
+        redirectURL: router.currentRoute.path
       } }
     // 获取vuex中用户状态信息
-    const { user } = store.state
+    const user = store.state.user
     // 没登录
     if (!user || !user.token || !user.refresh_token) {
       // 强制去登录,并做了回跳处理
@@ -75,7 +75,7 @@ instance.interceptors.response.use(res => {
       // 更新vuex数据与本地数据
       store.commit('setUser', { token: data.token, refresh_token: user.refresh_token })
       // 重新发送之前失败的请求--请求失败的请求配置参数 err.config
-      instance(err.config)
+      return instance(err.config) // 注意 : 一定要return一个promise对象
     } catch (e) {
       // refresh_token也失效
       user.commit('delUser')
