@@ -1,10 +1,19 @@
 <template>
   <div class="container">
     <!-- 顶部 -->
-    <van-nav-bar fixed v-if="path!=='/user'" title="黑马头条" right-text="搜索" @click-right="$router.push('/search')" />
+    <van-nav-bar
+      fixed
+      v-if="path!=='/user'"
+      title="黑马头条"
+      right-text="搜索"
+      @click-right="$router.push('/search')"
+    />
     <!-- 内容 -->
     <div class="my-wrapper" :class="{noTop:path==='/user'}">
-      <router-view></router-view>
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <!-- 底部 -->
     <van-tabbar v-model="active" route>
@@ -34,19 +43,19 @@ export default {
 </script>
 
 <style lang="less">
-.container{
+.container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  .my-wrapper {
     width: 100%;
     height: 100%;
-    position: relative;
-    .my-wrapper{
-        width: 100%;
-        height: 100%;
-        padding: 46px 0 50px;
-        overflow: hidden;
-        box-sizing: border-box;
-        &.noTop{
-            padding-top: 0;
-        }
+    padding: 46px 0 50px;
+    overflow: hidden;
+    box-sizing: border-box;
+    &.noTop {
+      padding-top: 0;
     }
+  }
 }
 </style>

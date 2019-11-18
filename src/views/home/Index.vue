@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <!-- tab项 -->
-    <van-tabs swipeable v-model="activeIndex">
+    <van-tabs swipeable v-model="activeIndex" :slazy-render="false" @change="changeChannel">
       <van-tab :key="channel.id" v-for="channel in myChannels" :title="channel.name">
-        <div class="scroll-wrapper">
+        <div ref="scrollWrapper" class="scroll-wrapper" @scroll="remeber($event)">
             <!-- 下拉刷新 -->
             <van-pull-refresh
               v-model="activeChannel.downLoading"
@@ -17,25 +17,26 @@
                 finished-text="没有更多了"
                 @load="onLoad"
               >
-                <van-cell v-for="article in activeChannel.articles" :key="article.art_id.toString()">
+                <!-- <van-cell v-for="article in activeChannel.articles" :key="article.art_id.toString()" :to="'/article/'+article.art_id"> -->
+                <van-cell v-for="article in activeChannel.articles" :key="article.art_id.toString()" >
                   <!-- 内容 -->
                   <div class="article_item">
                     <h3 class="van-ellipsis">{{article.title}}</h3>
                     <!-- 三张图结构 -->
                     <div class="img_box" v-if="article.cover.type===3">
-                      <van-image class="w33" fit="cover" :src="article.cover.images[0]" />
-                      <van-image class="w33" fit="cover" :src="article.cover.images[1]" />
-                      <van-image class="w33" fit="cover" :src="article.cover.images[2]" />
+                      <van-image lazy-load class="w33" fit="cover" :src="article.cover.images[0]" />
+                      <van-image lazy-load class="w33" fit="cover" :src="article.cover.images[1]" />
+                      <van-image lazy-load class="w33" fit="cover" :src="article.cover.images[2]" />
                     </div>
                     <!-- 一张图结构 -->
                     <div class="img_box" v-if="article.cover.type===1">
-                      <van-image class="w100" fit="cover" :src="article.cover.images[0]" />
+                      <van-image lazy-load class="w100" fit="cover" :src="article.cover.images[0]" />
                     </div>
                     <div class="info_box">
                       <span>{{article.aut_name}}</span>
                       <span>{{article.comm_count}} 评论</span>
-                      <span>{{article.pubdate}}</span>
-                      <span class="close">
+                      <span>{{article.pubdate|relTime}}</span>
+                      <span class="close" @click="openMoreAction" v-if="user.token">
                         <van-icon name="cross"></van-icon>
                       </span>
                     </div>
@@ -50,10 +51,13 @@
     <span class="bar_btn" slot="nav-right">
       <van-icon name="wap-nav"></van-icon>
     </span>
+    <more-action v-if="user.token" v-model="showMoreAction"></more-action>
   </div>
 </template>
 
 <script>
+import MoreAction from '@/views/home/components/MoreAction'
+import { mapState } from 'vuex'
 import { getMyChannels } from '@/api/channel'
 import { getArticle } from '@/api/article'
 export default {
@@ -66,8 +70,13 @@ export default {
       //   articles: [], // 文章列表
       myChannels: [], // 我的频道数据
       activeIndex: 0, // 当前激活的频道索引
-      refreshSuccessText: '' // 刷新成功提示信息
+      refreshSuccessText: '', // 刷新成功提示信息
+      // 显示更多操作
+      showMoreAction: false
     }
+  },
+  components: {
+    MoreAction
   },
   created () {
     this.getMyChannels() // 获取频道数据
@@ -76,10 +85,47 @@ export default {
     // 通过激活的频道ID
     activeChannel () {
       return this.myChannels[this.activeIndex]
+    },
+    ...mapState(['user']) // 映射vuex管理的用户登录数据
+  },
+  watch: {
+    user () { // 监听用户登录状态
+      this.activeIndex = 0 // 初始化默认激活索引
+      this.getMyChannels() // 重新获取频道
+      this.onLoad() // 重新加载数据
+    }
+  },
+  // keep-alive 组件激活时调用
+  activated () {
+    if (this.$refs['scrollWrapper']) { // 如果dom结构存在
+      const dom = this.$refs['scrollWrapper'][this.activeIndex] // 取得当前激活tab的dom结构
+      dom.scrollTop = this.activeChannel.scrollTop
     }
   },
   methods: {
-    // 加载
+    // 打开更多操作对话框
+    openMoreAction () {
+      this.showMoreAction = true
+    },
+    // 滚动事件
+    remeber (e) {
+      this.activeChannel.scrollTop = e.target.scrollTop // 将卷去距离记录下来
+    },
+    // 切换频道触发事件
+    changeChannel () {
+      if (!this.activeChannel.articles.length) { // 文章列表中有数据
+        this.activeChannel.upLoading = true // 显示加载中状态
+        this.activeChannel.finished = false // 先不显示 是否加载完毕的提示信息
+        this.onLoad() // 调用加载
+      } else {
+        this.$nextTick(() => { // 最后执行,因为此操作有可能被覆盖掉
+          const dom = this.$refs['scrollWrapper'][this.activeIndex] // 取出当前激活tab的dom结构
+          dom.scrollTop = this.activeChannel.scrollTop // 将记录的顶部卷去距离复制给它的卷去距离
+        })
+      }
+    },
+
+    // 上拉加载
     async onLoad () {
       // @load特点 : 默认在组件初始化会加载一次
       // @load特点 : 当加载的内容渲染后不足铺满屏幕,继续触发一次
@@ -149,20 +195,24 @@ export default {
       // myChannels数组中每一项中包含频道ID&频道名称
       // 但是需要myChannels数组中每一项中包含更多的信息
       // 例如 : 文章列表 + 正在加载 + 正在刷新 + 是否全部加载 + 时间戳
-      this.myChannels = data.channels.map(item => {
-        return {
-          id: item.id, // 频道id
-          name: item.name, // 频道名字
-          articles: [], // 频道对应文章列表
-          upLoading: false, // 加载中
-          downLoading: false, // 刷新中
-          finished: false, // 是否已经全部加载了，没有数据了
-          timestamp: Date.now() // 相当于分页的页码
-        }
+
+      this.myChannels = [] // 用户登录状态发生改变时,清空频道数组
+      this.$nextTick(() => {
+        this.myChannels = data.channels.map(item => {
+          return {
+            id: item.id, // 频道id
+            name: item.name, // 频道名字
+            articles: [], // 频道对应文章列表
+            upLoading: false, // 加载中
+            downLoading: false, // 刷新中
+            finished: false, // 是否已经全部加载了，没有数据了
+            timestamp: Date.now(), // 相当于分页的页码
+            scrollTop: 0 // 记录阅读位置
+          }
+        })
       })
     }
   }
-
 }
 </script>
 
