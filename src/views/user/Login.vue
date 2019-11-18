@@ -34,8 +34,8 @@ export default {
     return {
       // 登录数据
       loginForm: {
-        mobile: '',
-        code: ''
+        mobile: '13911111111',
+        code: '246810'
       },
       // 错误信息
       errMsg: {

@@ -78,7 +78,7 @@ instance.interceptors.response.use(res => {
       return instance(err.config) // 注意 : 一定要return一个promise对象
     } catch (e) {
       // refresh_token也失效
-      user.commit('delUser')
+      store.commit('delUser')
       // 强制去登录,并做了回跳处理
       return router.push(loginConfig)
     }
