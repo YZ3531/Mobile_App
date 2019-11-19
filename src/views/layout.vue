@@ -16,7 +16,7 @@
         <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <!-- 底部 -->
-    <van-tabbar v-model="active" route>
+    <van-tabbar  route>
       <van-tabbar-item to="/" icon="home-o">首页</van-tabbar-item>
       <van-tabbar-item to="/question" icon="chat-o">问答</van-tabbar-item>
       <van-tabbar-item to="/video" icon="video-o">视频</van-tabbar-item>
@@ -30,7 +30,7 @@ export default {
   name: 'container-layout',
   data () {
     return {
-      active: 0
+
     }
   },
   computed: {
@@ -42,7 +42,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .container {
   width: 100%;
   height: 100%;
