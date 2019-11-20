@@ -1,7 +1,7 @@
 /**
  * 举报类型
  */
-export const reports = [
+export const reportType = [
   { value: 0, label: '其他问题' },
   { value: 1, label: '标题夸张' },
   { value: 2, label: '低俗色情' },

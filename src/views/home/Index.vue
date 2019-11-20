@@ -51,10 +51,11 @@
         </div>
       </van-tab>
     </van-tabs>
-    <!-- 更多项 -->
-    <span class="bar_btn" slot="nav-right">
+    <!-- 频道按钮 -->
+    <span class="bar_btn" @click="openChannelEdit()" slot="nav-right">
       <van-icon name="wap-nav"></van-icon>
     </span>
+    <!-- 更多操作 -->
     <more-action
       v-if="user.token"
       v-model="showMoreAction"
@@ -63,6 +64,19 @@
       :articleID="articleID"
       name="close"
     ></more-action>
+    <!-- 频道编辑组件 -->
+    <!-- <channel-edit
+      v-model="showEditChannel"
+      :myChannels="myChannels"
+      :activeIndex="activeIndex" // 可以合写，子组件提交更改activeIndex的值，父组件的也会跟着改变
+      @update="activeIndex=$event" // 可以合写，使用.sync，等同于v-model，双向绑定
+    ></channel-edit> -->
+    <!-- 频道编辑组件简写方式 -->
+    <channel-edit
+      v-model="showEditChannel"
+      :myChannels="myChannels"
+      :activeIndex.sync="activeIndex"
+    ></channel-edit>
   </div>
 </template>
 
@@ -71,6 +85,7 @@ import { mapState } from 'vuex'
 import { getMyChannels } from '@/api/channel'
 import { getArticle } from '@/api/article'
 import MoreAction from './components/MoreAction' // 引入举报组件
+import channelEdit from './components/channelEdit' // 引入举报组件
 export default {
   name: 'container-home',
   data () {
@@ -84,11 +99,15 @@ export default {
       refreshSuccessText: '', // 刷新成功提示信息
       // 显示更多操作
       showMoreAction: false,
-      articleID: null
+      // 传给更多操作的ID
+      articleID: null,
+      // 是否显示 频道编辑组件
+      showEditChannel: false
     }
   },
   components: {
-    MoreAction // 注册举报组件
+    MoreAction, // 注册举报组件
+    channelEdit // 注册频道修改组件
   },
   created () {
     this.getMyChannels() // 获取频道数据
@@ -117,8 +136,12 @@ export default {
     }
   },
   methods: {
+    // 打开频道管理界面
+    openChannelEdit () {
+      this.showEditChannel = true
+    },
+    // 确定不喜欢，子组件给父组件的通知
     removeArticle () {
-      // 确定不喜欢，子组件给父组件的通知
       const articles = this.activeChannel.articles // 取出当前频道文章列表
       const index = articles.findIndex(
         item => item.art_id.toString() === this.articleID

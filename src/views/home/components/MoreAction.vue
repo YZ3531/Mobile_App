@@ -7,14 +7,18 @@
     </van-cell-group>
     <van-cell-group v-else>
       <van-cell icon="arrow-left" @click="isReport=false">返回</van-cell>
-      <van-cell @click="report(item.value)" v-for="item in reports" :key="item.value">{{item.label}}</van-cell>
+      <van-cell
+        @click="report(item.value)"
+        v-for="item in reportType"
+        :key="item.value"
+      >{{item.label}}</van-cell>
     </van-cell-group>
   </van-popup>
 </template>
 
 <script>
 import { disLick, report } from '@/api/article'
-import { reports } from '@/api/constants'
+import { reportType } from '@/api/constants'
 export default {
   name: 'more-action',
   props: {
@@ -30,21 +34,30 @@ export default {
   data () {
     return {
       isReport: false,
-      reports
+      reportType
     }
   },
   methods: {
     async report (type) { // 举报
+      // 执行
+      // 提示
+      // 关闭对话框
+      // 通知父组件删除
       try {
         await report(this.articleID, type)
         this.$toast({ type: 'success', message: '举报成功' }) // 提示信息
         this.$emit('input', false)
         this.$emit('on-report', this.articleID)
       } catch (e) {
-        this.$toast({ type: 'fail', message: '举报失败' })
+        if (e.respones && e.respones.stutas === 409) {
+          return this.$toast({ type: 'fail', message: '重复举报' })
+        } else {
+          this.$toast({ type: 'fail', message: '举报失败' })
+        }
       }
     },
-    async disLick () { // 不喜欢 请求
+    async disLick () {
+      // 不喜欢 请求
       try {
         await disLick(this.articleID) // 请求
         this.$toast({ type: 'success', message: '操作成功' }) // 提示信息
@@ -55,11 +68,10 @@ export default {
       }
     }
   }
-
 }
 </script>
 
-<style>
+<style scoped>
 .van-popup {
   width: 80%;
   border-radius: 4px;
