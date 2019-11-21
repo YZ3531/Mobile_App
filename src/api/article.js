@@ -16,7 +16,7 @@ export const disLick = (ID) => {
   })
 }
 
-/** 不喜欢**/
+/** 根据类型举报**/
 export const report = (ID, type) => {
   return request('/app/v1_0/article/reports', 'post', {
     target: ID,

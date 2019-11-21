@@ -15,16 +15,16 @@
       <van-grid class="van-hairline--left">
         <van-grid-item v-for="(item,index) in myChannels" :key="index">
           <span class="f12"  :class="{red:index===activeIndex}" @click="enterChannel(index)">{{item.name}}</span>
-          <van-icon v-if="editing&&index!==0" class="btn" name="cross" ></van-icon>
+          <van-icon @click="delChannel(item.id,index)" v-if="editing&&index!==0" class="btn" name="cross" ></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
     <div class="channel">
       <div class="tit">可选频道：</div>
       <van-grid class="van-hairline--left">
-        <van-grid-item v-for="index in optionalChannels" :key="index.id">
-          <span class="f12">{{index.name}}</span>
-          <van-icon v-if="editing" class="btn" name="plus"></van-icon>
+        <van-grid-item v-for="item in optionalChannels" :key="item.id">
+          <span class="f12">{{item.name}}</span>
+          <van-icon @click="addChannel(item)" v-if="editing" class="btn" name="plus"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { getAllChannels } from '@/api/channel'
+import { getAllChannels, delChannel, addChannel } from '@/api/channel'
 export default {
   props: {
     value: { // 是否显示
@@ -55,9 +55,62 @@ export default {
     }
   },
   methods: {
+    // 添加频道
+    async addChannel ({ id, name }) {
+      try {
+        // 包装传参,支撑接口调用,支撑本地存储
+        // 接口需要 id,seq
+        // 本地需要 id,name
+        // 最终数据 id,seq,name
+        const orderChannels = this.myChannels.map((item, i) => {
+        // 转换我的频道数据格式,添加新字段seq,为满足调用接口使用
+          return {
+            id: item.id,
+            name: item.name,
+            seq: i
+          }
+        })
+        // 添加新频道到我的频道数组中
+        orderChannels.push({ id, name, seq: orderChannels.length })
+        // 后台数据不需要 推荐 这一项频道
+        orderChannels.splice(0, 1)
+        // 调用添加API
+        await addChannel(orderChannels)
+        // 提示信息
+        this.$toast.success('添加成功')
+        // 在我的数组中对新添加的频道补全信息
+        this.myChannels.push({
+          id,
+          name,
+          articles: [],
+          upLoading: false,
+          downLoading: false,
+          finished: false,
+          timestamp: Date.now(),
+          scrollTop: 0
+
+        })
+      } catch (e) {
+        this.$toast.fail('添加失败')
+      }
+    },
+    // 删除频道
+    async delChannel (id, index) {
+      try {
+        await delChannel(id) // 内存中删除
+        this.$toast.success('删除成功') // 提示信息
+        if (index <= this.activeIndex) { // 如果当前删除的频道在选中频道之前(索引小于选中频道索引,在选中频道左侧)
+          this.$emit('update:activeIndex', this.activeIndex - 1) // 通知父组件更改选中频道往前移一位,便于正确对应选中频道
+        }
+        this.myChannels.splice(index, 1) // 在我的频道数组中删除对应索引的频道--myChannel是双向绑定的
+        this.$emit('on-delete') // 通知父组件刷新页码,完成数据中的删除
+      } catch (e) {
+        this.$toast.fail('删除失败') // 提示信息
+      }
+    },
     // 点击进入频道
     enterChannel (index) {
-      console.log(index)
+      // console.log(index)
       if (!this.editing) {
         this.$emit('input', false)
         // this.$emit('update', index)

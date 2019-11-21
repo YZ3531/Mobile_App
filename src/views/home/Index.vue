@@ -76,6 +76,7 @@
       v-model="showEditChannel"
       :myChannels="myChannels"
       :activeIndex.sync="activeIndex"
+      @on-delete="changeChannel"
     ></channel-edit>
   </div>
 </template>
@@ -113,7 +114,7 @@ export default {
     this.getMyChannels() // 获取频道数据
   },
   computed: {
-    // 通过激活的频道ID
+    // 当前激活的频道
     activeChannel () {
       return this.myChannels[this.activeIndex]
     },
