@@ -60,7 +60,8 @@ instance.interceptors.response.use(res => {
     // 没登录
     if (!user || !user.token || !user.refresh_token) {
       // 强制去登录,并做了回跳处理
-      return router.push(loginConfig)
+      router.push(loginConfig)
+      return Promise.reject(err) // 让函数接收一个错误的promise,能够阻止一些错误了的程序还会运行的bug
     }
     // token失效
     try {
@@ -80,7 +81,8 @@ instance.interceptors.response.use(res => {
       // refresh_token也失效
       store.commit('delUser')
       // 强制去登录,并做了回跳处理
-      return router.push(loginConfig)
+      router.push(loginConfig)
+      return Promise.reject(err)
     }
   }
   return Promise.reject(err)

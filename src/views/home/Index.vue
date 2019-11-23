@@ -18,7 +18,7 @@
               @load="onLoad"
             >
               <!-- <van-cell v-for="article in activeChannel.articles" :key="article.art_id.toString()" :to="'/article/'+article.art_id"> -->
-              <van-cell v-for="article in activeChannel.articles" :key="article.art_id.toString()">
+              <van-cell :to="{name:'article',params:{id:article.art_id.toString()}}" v-for="article in activeChannel.articles" :key="article.art_id.toString()">
                 <!-- 内容 -->
                 <div class="article_item">
                   <h3 class="van-ellipsis">{{article.title}}</h3>
