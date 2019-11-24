@@ -68,3 +68,12 @@ export const getCommentsOrReplys = ({ type, source, offset, limit = 10 }) => {
   // limit - 每次加载数据的条数，默认时10条
   return request('/app/v1_0/comments', 'get', { type, source, offset, limit })
 }
+
+/** 提交评论或回复**/
+export const commentOrReply = (target, content, artId) => {
+  return request('/app/v1_0/comments', 'post', {
+    target, // 评论操作-文章ID | 回复操作-评论ID
+    content, // 内容
+    art_id: artId // 文章ID(当你是回复操作)
+  })
+}

@@ -13,8 +13,6 @@
           <p class="time">{{article.pubdate|relTime}}</p>
         </div>
         <!-- 是否已经关注 -->
-        <!-- <van-button round size="small" type="info" v-if="article.is_followed">已关注</van-button>
-        <van-button round size="small" type="info" v-else>+ 关注</van-button>-->
         <van-button
           round
           size="small"
@@ -75,9 +73,6 @@ export default {
   // 当前文章详情组件已被缓存,内容展示不该写在created(因为只会执行一次),应使用actived(组件被激活时)
   // 需求 : 如果激活组件时,本次查看文章与上次查看文章ID一致时,不需重新加载
   activated () {
-    console.log(this.$route.params.id)
-    console.log(this.article.art_id.toString())
-
     if (this.$route.params.id !== this.article.art_id.toString()) {
       this.getArticle()
       this.scrollTop = 0
@@ -127,7 +122,6 @@ export default {
     async getArticle () {
       const data = await getArticleDetail(this.$route.params.id)
       this.article = data
-      console.log(this.article)
     },
     // 记录阅读位置
     remember (e) {
@@ -156,7 +150,7 @@ export default {
     }
   },
   components: {
-    Comment
+    Comment // 挂载评论组件
   }
 }
 </script>
