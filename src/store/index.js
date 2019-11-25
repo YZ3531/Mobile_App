@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: auth.getUser()
+    user: auth.getUser(),
+    photo: ''
   },
   mutations: {
     // 存储用户token
@@ -18,6 +19,10 @@ export default new Vuex.Store({
     delUser (state) {
       state.user = {} // 更改state数据
       auth.delUser() // 更改本地token
+    },
+    // 保存用户头像
+    setPhoto (state, data) {
+      state.photo = data
     }
   },
   actions: {
