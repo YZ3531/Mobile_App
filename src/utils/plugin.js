@@ -12,3 +12,12 @@ export default {
     Vue.filter('relTime', relTime) // 注册全局过滤器,用来转换时间格式
   }
 }
+
+setTimeout(() => console.log('c'), 0)
+console.log('d')
+new Promise((resolve) => {
+  console.log('e')
+  resolve()
+  console.log('f')
+}).then(() => console.log('g'))
+console.log('h')

@@ -68,7 +68,6 @@ export default {
       const data = await getUserInfo()
       this.user = data
       this.setPhoto(data.photo)
-      // console.log(this.user)
     },
     // 退出登录
     logout () {

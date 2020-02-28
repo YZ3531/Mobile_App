@@ -48,7 +48,6 @@ export default {
     async onLoading () {
       // 调用API根据数据获取搜索结果
       const data = await searchArticle(this.reqParams)
-      console.log(data)
       // 将搜索结果添加到数据数组中
       this.articles.push(...data.results)
       // 关闭加载状态
@@ -61,9 +60,6 @@ export default {
         this.reqParams.page++
       }
     }
-  },
-  created () {
-    // console.log(this.reqParams)
   }
 }
 </script>

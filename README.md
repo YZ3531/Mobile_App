@@ -1,4 +1,4 @@
-# hm-toutiao-m
+# TT-M
 
 ## Project setup
 ```

@@ -1,6 +1,6 @@
 <template>
   <div class="container" @scroll="remember($event)" ref="articleContent">
-    <van-nav-bar fixed title="文章详情" left-arrow @click-left="$router.back()" />
+    <van-nav-bar fixed title="文章详情" left-arrow right-text="分享" @click-right="share" @click-left="$router.back()" />
     <div class="detail">
       <!-- 文章名称 -->
       <h3 class="title">{{article.title}}</h3>
@@ -81,6 +81,17 @@ export default {
     }
   },
   methods: {
+    // 分享
+    share () {
+      // eslint-disable-next-line no-undef
+      plus.share.sendWithSystem({ content: '分享内容', href: 'http://www.dcloud.io/' }, function () {
+        // console.log('分享成功')
+        this.$toast.success('分享成功')
+      }, function (e) {
+        // console.log('分享失败：' + JSON.stringify(e))
+        this.$toast.fail('分享失败：' + JSON.stringify(e))
+      })
+    },
     // 不喜欢 , 取消不喜欢 , 点赞 , 取消点赞
     async updateStatus (type) {
       try {
